@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "sessionvickyadf-df"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_password": {
+			"value": ""
+		},
+		"lnk_sql_table1_password": {
+			"value": ""
+		},
+		"lnk_sql_table2_password": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "vickyadf-df.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "adfsessiondemo"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "vickyadf-df"
+		},
+		"lnk_sql_table1_properties_typeProperties_server": {
+			"value": "vickyadf-df.database.windows.net"
+		},
+		"lnk_sql_table1_properties_typeProperties_database": {
+			"value": "@{linkedService().databasename}"
+		},
+		"lnk_sql_table1_properties_typeProperties_userName": {
+			"value": "vickyadf-df"
+		},
+		"lnk_sql_table2_properties_typeProperties_server": {
+			"value": "vickyadf-df.database.windows.net"
+		},
+		"lnk_sql_table2_properties_typeProperties_database": {
+			"value": "@{linkedService().databasename}"
+		},
+		"lnk_sql_table2_properties_typeProperties_userName": {
+			"value": "vickyadf-df"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_sourcetablename": {
+			"value": "emp"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_destinationtablename": {
+			"value": "emp1"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_databasename": {
+			"value": "adfsessiondemo"
+		}
+	}
+}

@@ -1,0 +1,1964 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "sessionvickyadf-df"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureBlobStorage2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage2'"
+		},
+		"AzureSqlDatabase1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AzureSqlDatabase1'"
+		},
+		"lnk_sql_table1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'lnk_sql_table1'"
+		},
+		"lnk_sql_table2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'lnk_sql_table2'"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "vickyadf-df.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "adfsessiondemo"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "vickyadf-df"
+		},
+		"lnk_sql_table1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "vickyadf-df.database.windows.net"
+		},
+		"lnk_sql_table1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().databasename}"
+		},
+		"lnk_sql_table1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "vickyadf-df"
+		},
+		"lnk_sql_table2_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "vickyadf-df.database.windows.net"
+		},
+		"lnk_sql_table2_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().databasename}"
+		},
+		"lnk_sql_table2_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "vickyadf-df"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_sourcetablename": {
+			"type": "string",
+			"defaultValue": "emp"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_destinationtablename": {
+			"type": "string",
+			"defaultValue": "emp1"
+		},
+		"trigger1_properties_Parametrized_Pipeline_parameters_databasename": {
+			"type": "string",
+			"defaultValue": "adfsessiondemo"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_ConditionalSplit')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Conditional Split",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_ConditionalSplit",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employee": {},
+									"Empout": {},
+									"TesterOutput": {},
+									"FunctionalOutput": {},
+									"NoDeptOutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-28T04:02:44Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_ConditionalSplit')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_Exist')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MappingDF_Exist",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Exist",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employee": {},
+									"Department": {},
+									"ExistOutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-29T02:20:56Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Exist')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_Filter')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Filter_Dataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Filter",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"EmployeeFilter": {},
+									"Department": {},
+									"Filteroutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-28T03:08:29Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Filter')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_Join')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "JoinDataFlow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Join",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employee": {},
+									"Department": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-27T03:04:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Join')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_LookUp')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MappingDF_Lookup",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Lookup",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employee": {},
+									"Department": {},
+									"Lookup": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-29T02:59:24Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Lookup')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDF_Union')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Union",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"softwareemp": {},
+									"TesterEmp": {},
+									"FunctionalEmp": {},
+									"UnionOutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-29T02:37:53Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Union')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Aggregate')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MappingDF_Aggregate",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MappingDataFlow_Aggregation",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Employees": {},
+									"AggregatedOutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-28T03:22:36Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MappingDataFlow_Aggregation')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parametrized_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Parametrised Data Copy",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_sql_table1",
+								"type": "DatasetReference",
+								"parameters": {
+									"databasename": {
+										"value": "@pipeline().parameters.databasename",
+										"type": "Expression"
+									},
+									"sourcetable": {
+										"value": "@pipeline().parameters.sourcetablename",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_sql_table2",
+								"type": "DatasetReference",
+								"parameters": {
+									"databasename": {
+										"value": "@pipeline().parameters.databasename",
+										"type": "Expression"
+									},
+									"destinationtable": {
+										"value": "@pipeline().parameters.destinationtablename",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"sourcetablename": {
+						"type": "string"
+					},
+					"destinationtablename": {
+						"type": "string"
+					},
+					"databasename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-23T12:10:21Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_sql_table1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sql_table2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Wrangling_Dataflow_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Power Query1",
+						"type": "ExecuteWranglingDataflow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "powerquery1",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"ds_wrangling_file1": {},
+									"ds_wrangling_file2": {},
+									"UserQuerydscsvoutput": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"queries": [
+								{
+									"queryName": "UserQuery",
+									"dataflowSinks": [
+										{
+											"name": "UserQuerydscsvoutput",
+											"dataset": {
+												"referenceName": "ds_csv_output",
+												"type": "DatasetReference",
+												"parameters": {}
+											},
+											"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\ttruncate: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> UserQuerydscsvoutput"
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"Filename": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-23T12:10:21Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/powerquery1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@concat('JoinOuput','_','2024-11-27')",
+							"type": "Expression"
+						},
+						"container": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					},
+					{
+						"name": "Std_in_Dept",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ds_filteroutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID ",
+						"type": "String"
+					},
+					{
+						"name": "Dept_Name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet_test')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@concat(dataset().filename,'_',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+							"type": "Expression"
+						},
+						"container": "output"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "UTF8"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "UTF8"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "UTF8"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "UTF8"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "UTF8"
+					},
+					{
+						"name": "Dept_Name",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_csv_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "output"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_csv_software')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "softwareoutput",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_functional')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "FunctionalOutput",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_parquet_output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "output"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_table1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lnk_sql_table1",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"databasename": {
+							"value": "@dataset().databasename",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"databasename": {
+						"type": "string"
+					},
+					"sourcetable": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Emp_Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Emp_Dept",
+						"type": "varchar"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().sourcetable",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lnk_sql_table1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_table2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lnk_sql_table2",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"databasename": {
+							"value": "@dataset().databasename",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"databasename": {
+						"type": "string"
+					},
+					"destinationtable": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Emp_Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Emp_Dept",
+						"type": "varchar"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().destinationtable",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lnk_sql_table2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_tester_input')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "TesterOutput",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wrangling_file1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Employee_Details.xlsx",
+						"container": "input"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Emp_No",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Name",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Salary",
+						"type": "String"
+					},
+					{
+						"name": "Emp_Manager",
+						"type": "String"
+					},
+					{
+						"name": "Dept_ID",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wrangling_file2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Department.xlsx",
+						"container": "input"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Dept_ID ",
+						"type": "String"
+					},
+					{
+						"name": "Dept_Name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage2_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSqlDatabase1_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSqlDatabase1_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSqlDatabase1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AzureSqlDatabase1_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lnk_sql_table1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"databasename": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('lnk_sql_table1_properties_typeProperties_server')]",
+					"database": "[parameters('lnk_sql_table1_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('lnk_sql_table1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('lnk_sql_table1_password')]"
+					},
+					"alwaysEncryptedSettings": {
+						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lnk_sql_table2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"databasename": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('lnk_sql_table2_properties_typeProperties_server')]",
+					"database": "[parameters('lnk_sql_table2_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('lnk_sql_table2_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('lnk_sql_table2_password')]"
+					},
+					"alwaysEncryptedSettings": {
+						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Parametrized_Pipeline",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"sourcetablename": "[parameters('trigger1_properties_Parametrized_Pipeline_parameters_sourcetablename')]",
+							"destinationtablename": "[parameters('trigger1_properties_Parametrized_Pipeline_parameters_destinationtablename')]",
+							"databasename": "[parameters('trigger1_properties_Parametrized_Pipeline_parameters_databasename')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2024-11-21T09:09:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Parametrized_Pipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Aggregation')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "Employees"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "AggregatedOutput"
+						}
+					],
+					"transformations": [
+						{
+							"name": "EmployeesCount"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employees",
+						"Employees aggregate(groupBy(Dept_ID),",
+						"     AggragatedCount = count(Emp_No)) ~> EmployeesCount",
+						"EmployeesCount sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['AggregatedCount'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> AggregatedOutput"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_ConditionalSplit')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "Empout"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "TesterOutput"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "FunctionalOutput"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "NoDeptOutput"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Software"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"Employee split(equals(Dept_ID,'100'),",
+						"     equals(Dept_ID,'101'),",
+						"     equals(Dept_ID,'102'),",
+						"     disjoint: false) ~> Software@(softwareoutput, testeroutput, functionaloutput, nodepartment)",
+						"Software@softwareoutput sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['softwareoutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> Empout",
+						"Software@testeroutput sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['TesterOutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> TesterOutput",
+						"Software@functionaloutput sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['FunctionalOutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> FunctionalOutput",
+						"Software@nodepartment sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['NoDeptOutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> NoDeptOutput"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Exist')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file2",
+								"type": "DatasetReference"
+							},
+							"name": "Department"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "ExistOutput"
+						}
+					],
+					"transformations": [
+						{
+							"name": "EmployeeExist"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"source(output(",
+						"          {Dept_ID } as string,",
+						"          Dept_Name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Department",
+						"Employee, Department exists(Dept_ID == {Dept_ID },",
+						"     negate:true,",
+						"     broadcast: 'auto')~> EmployeeExist",
+						"EmployeeExist sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['ExistOutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> ExistOutput"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file2')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Filter')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "EmployeeFilter"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file2",
+								"type": "DatasetReference"
+							},
+							"name": "Department"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Ds_filteroutput",
+								"type": "DatasetReference"
+							},
+							"name": "Filteroutput"
+						}
+					],
+					"transformations": [
+						{
+							"name": "filterdeptid"
+						},
+						{
+							"name": "join1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> EmployeeFilter",
+						"source(output(",
+						"          {Dept_ID } as string,",
+						"          Dept_Name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Department",
+						"EmployeeFilter filter(equals(Dept_ID,'101')) ~> filterdeptid",
+						"filterdeptid, Department join(Dept_ID == {Dept_ID },",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     partitionBy('hash', 1),",
+						"     broadcast: 'auto')~> join1",
+						"join1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string,",
+						"          {Dept_ID } as string,",
+						"          Dept_Name as string",
+						"     ),",
+						"     partitionFileNames:['FilterJoin.csv'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> Filteroutput"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file2')]",
+				"[concat(variables('factoryId'), '/datasets/Ds_filteroutput')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Join')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file2",
+								"type": "DatasetReference"
+							},
+							"name": "Department"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "JoinCondition"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"source(output(",
+						"          {Dept_ID } as string,",
+						"          Dept_Name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Department",
+						"Employee, Department join(Dept_ID == {Dept_ID },",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> JoinCondition",
+						"JoinCondition sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Dept_ID as string,",
+						"          Std_in_Dept as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file2')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Lookup')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "Employee"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file2",
+								"type": "DatasetReference"
+							},
+							"name": "Department"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "Lookup"
+						}
+					],
+					"transformations": [
+						{
+							"name": "LookupEmployee"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Employee",
+						"source(output(",
+						"          {Dept_ID } as string,",
+						"          Dept_Name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Department",
+						"Employee, Department lookup(Dept_ID == {Dept_ID },",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> LookupEmployee",
+						"LookupEmployee sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Lookup"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file2')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MappingDataFlow_Union')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_software",
+								"type": "DatasetReference"
+							},
+							"name": "softwareemp"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_tester_input",
+								"type": "DatasetReference"
+							},
+							"name": "TesterEmp"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_functional",
+								"type": "DatasetReference"
+							},
+							"name": "FunctionalEmp"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "UnionOutput"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AggregationofEmployee"
+						},
+						{
+							"name": "UnionSelect"
+						},
+						{
+							"name": "SortEmployee"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string,",
+						"          Country as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> softwareemp",
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string,",
+						"          Country as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> TesterEmp",
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as string,",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string,",
+						"          Country as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> FunctionalEmp",
+						"softwareemp, TesterEmp, FunctionalEmp union(byName: true)~> AggregationofEmployee",
+						"AggregationofEmployee select(mapColumn(",
+						"          Employee_No = Emp_No,",
+						"          Emp_Name,",
+						"          Dept_ID,",
+						"          Country,",
+						"          Emp_Salary",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> UnionSelect",
+						"UnionSelect sort(desc(Emp_Name, true)) ~> SortEmployee",
+						"SortEmployee sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['UnionOutput'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> UnionOutput"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_csv_software')]",
+				"[concat(variables('factoryId'), '/datasets/ds_tester_input')]",
+				"[concat(variables('factoryId'), '/datasets/ds_functional')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_output",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "emppartition"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Emp_No as string,",
+						"          Emp_Name as string,",
+						"          Emp_Salary as integer '0',",
+						"          Emp_Manager as string,",
+						"          Dept_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 window(over(Dept_ID),",
+						"     desc(Emp_Salary, true),",
+						"     RankSalary = denseRank()) ~> emppartition",
+						"emppartition sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['emppartition'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_csv_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/powerquery1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "WranglingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"name": "ds_wrangling_file1",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ds_wrangling_file1",
+							"dataset": {
+								"referenceName": "ds_wrangling_file1",
+								"type": "DatasetReference"
+							}
+						},
+						{
+							"name": "ds_wrangling_file2",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ds_wrangling_file2",
+							"dataset": {
+								"referenceName": "ds_wrangling_file2",
+								"type": "DatasetReference"
+							}
+						}
+					],
+					"script": "section Section1;\r\nshared ds_wrangling_file1 = let AdfDoc = AzureStorage.BlobContents(\"https://vickyadf.blob.core.windows.net/input/Employee_Details.xlsx\"), Excel = Excel.Workbook(AdfDoc),ExcelSheet = Excel{[Item=\"Sheet1\",Kind=\"Sheet\"]}[Data], PromotedHeaders = Table.PromoteHeaders(ExcelSheet, [PromoteAllScalars = true]) in PromotedHeaders;\r\nshared ds_wrangling_file2 = let AdfDoc = AzureStorage.BlobContents(\"https://vickyadf.blob.core.windows.net/input/Department.xlsx\"), Excel = Excel.Workbook(AdfDoc),ExcelSheet = Excel{[Item=\"Sheet1\",Kind=\"Sheet\"]}[Data], PromotedHeaders = Table.PromoteHeaders(ExcelSheet, [PromoteAllScalars = true]) in PromotedHeaders;\r\nshared UserQuery = let Source = #\"ds_wrangling_file1\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"Dept_ID\"}, ds_wrangling_file2, {\"Dept_ID \"}, \"ds_wrangling_file2\", JoinKind.Inner),\r\n  #\"Expanded ds_wrangling_file2\" = Table.ExpandTableColumn(#\"Merged queries\", \"ds_wrangling_file2\", {\"Dept_Name\"}, {\"Dept_Name\"}),\r\n  #\"Sorted rows\" = Table.Sort(#\"Expanded ds_wrangling_file2\", {{\"Emp_No\", Order.Ascending}}),\r\n  #\"Grouped rows\" = Table.Group(#\"Sorted rows\", {\"Dept_ID\"}, {{\"Std_in_Dept\", each Table.RowCount(_), Int64.Type}}) in #\"Grouped rows\";\r\n",
+					"documentLocale": "en-us"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file1')]",
+				"[concat(variables('factoryId'), '/datasets/ds_wrangling_file2')]"
+			]
+		}
+	]
+}
