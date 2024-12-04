@@ -1,0 +1,103 @@
+{
+	"name": "MappingDataFlow_Union",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_software",
+						"type": "DatasetReference"
+					},
+					"name": "softwareemp"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_tester_input",
+						"type": "DatasetReference"
+					},
+					"name": "TesterEmp"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_functional",
+						"type": "DatasetReference"
+					},
+					"name": "FunctionalEmp"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "UnionOutput"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AggregationofEmployee"
+				},
+				{
+					"name": "UnionSelect"
+				},
+				{
+					"name": "SortEmployee"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> softwareemp",
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TesterEmp",
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> FunctionalEmp",
+				"softwareemp, TesterEmp, FunctionalEmp union(byName: true)~> AggregationofEmployee",
+				"AggregationofEmployee select(mapColumn(",
+				"          Employee_No = Emp_No,",
+				"          Emp_Name,",
+				"          Dept_ID,",
+				"          Country,",
+				"          Emp_Salary",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> UnionSelect",
+				"UnionSelect sort(desc(Emp_Name, true)) ~> SortEmployee",
+				"SortEmployee sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['UnionOutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> UnionOutput"
+			]
+		}
+	}
+}

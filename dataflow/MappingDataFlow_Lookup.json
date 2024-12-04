@@ -1,0 +1,65 @@
+{
+	"name": "MappingDataFlow_Lookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					},
+					"name": "Employee"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file2",
+						"type": "DatasetReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "Lookup"
+				}
+			],
+			"transformations": [
+				{
+					"name": "LookupEmployee"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee",
+				"source(output(",
+				"          {Dept_ID } as string,",
+				"          Dept_Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Department",
+				"Employee, Department lookup(Dept_ID == {Dept_ID },",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> LookupEmployee",
+				"LookupEmployee sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Lookup"
+			]
+		}
+	}
+}

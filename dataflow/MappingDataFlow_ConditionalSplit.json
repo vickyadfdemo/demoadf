@@ -1,0 +1,92 @@
+{
+	"name": "MappingDataFlow_ConditionalSplit",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					},
+					"name": "Employee"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "Empout"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "TesterOutput"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "FunctionalOutput"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "NoDeptOutput"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Software"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee",
+				"Employee split(equals(Dept_ID,'100'),",
+				"     equals(Dept_ID,'101'),",
+				"     equals(Dept_ID,'102'),",
+				"     disjoint: false) ~> Software@(softwareoutput, testeroutput, functionaloutput, nodepartment)",
+				"Software@softwareoutput sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['softwareoutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Empout",
+				"Software@testeroutput sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['TesterOutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> TesterOutput",
+				"Software@functionaloutput sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['FunctionalOutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> FunctionalOutput",
+				"Software@nodepartment sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['NoDeptOutput'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> NoDeptOutput"
+			]
+		}
+	}
+}

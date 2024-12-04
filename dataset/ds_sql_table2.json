@@ -1,0 +1,57 @@
+{
+	"name": "ds_sql_table2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnk_sql_table2",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"databasename": {
+					"value": "@dataset().databasename",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"databasename": {
+				"type": "string"
+			},
+			"destinationtable": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Emp_No",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Emp_Dept",
+				"type": "varchar"
+			},
+			{
+				"name": "Emp_Salary",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Manager",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().destinationtable",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

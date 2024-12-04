@@ -1,0 +1,54 @@
+{
+	"name": "Parquet_test",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat(dataset().filename,'_',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+					"type": "Expression"
+				},
+				"container": "output"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Emp_No",
+				"type": "UTF8"
+			},
+			{
+				"name": "Emp_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Emp_Salary",
+				"type": "UTF8"
+			},
+			{
+				"name": "Emp_Manager",
+				"type": "UTF8"
+			},
+			{
+				"name": "Dept_ID",
+				"type": "UTF8"
+			},
+			{
+				"name": "Dept_Name",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

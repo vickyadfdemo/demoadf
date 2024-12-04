@@ -1,0 +1,52 @@
+{
+	"name": "Ds_filteroutput",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "output"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Emp_No",
+				"type": "String"
+			},
+			{
+				"name": "Emp_Name",
+				"type": "String"
+			},
+			{
+				"name": "Emp_Salary",
+				"type": "String"
+			},
+			{
+				"name": "Emp_Manager",
+				"type": "String"
+			},
+			{
+				"name": "Dept_ID",
+				"type": "String"
+			},
+			{
+				"name": "Dept_ID ",
+				"type": "String"
+			},
+			{
+				"name": "Dept_Name",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

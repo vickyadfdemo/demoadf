@@ -1,0 +1,29 @@
+{
+	"name": "trigger1",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Parametrized_Pipeline",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"sourcetablename": "emp",
+					"destinationtablename": "emp1",
+					"databasename": "adfsessiondemo"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 15,
+				"startTime": "2024-11-21T09:09:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

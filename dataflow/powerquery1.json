@@ -1,0 +1,28 @@
+{
+	"name": "powerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "ds_wrangling_file1",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ds_wrangling_file1",
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "ds_wrangling_file2",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ds_wrangling_file2",
+					"dataset": {
+						"referenceName": "ds_wrangling_file2",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared ds_wrangling_file1 = let AdfDoc = AzureStorage.BlobContents(\"https://vickyadf.blob.core.windows.net/input/Employee_Details.xlsx\"), Excel = Excel.Workbook(AdfDoc),ExcelSheet = Excel{[Item=\"Sheet1\",Kind=\"Sheet\"]}[Data], PromotedHeaders = Table.PromoteHeaders(ExcelSheet, [PromoteAllScalars = true]) in PromotedHeaders;\r\nshared ds_wrangling_file2 = let AdfDoc = AzureStorage.BlobContents(\"https://vickyadf.blob.core.windows.net/input/Department.xlsx\"), Excel = Excel.Workbook(AdfDoc),ExcelSheet = Excel{[Item=\"Sheet1\",Kind=\"Sheet\"]}[Data], PromotedHeaders = Table.PromoteHeaders(ExcelSheet, [PromoteAllScalars = true]) in PromotedHeaders;\r\nshared UserQuery = let Source = #\"ds_wrangling_file1\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"Dept_ID\"}, ds_wrangling_file2, {\"Dept_ID \"}, \"ds_wrangling_file2\", JoinKind.Inner),\r\n  #\"Expanded ds_wrangling_file2\" = Table.ExpandTableColumn(#\"Merged queries\", \"ds_wrangling_file2\", {\"Dept_Name\"}, {\"Dept_Name\"}),\r\n  #\"Sorted rows\" = Table.Sort(#\"Expanded ds_wrangling_file2\", {{\"Emp_No\", Order.Ascending}}),\r\n  #\"Grouped rows\" = Table.Group(#\"Sorted rows\", {\"Dept_ID\"}, {{\"Std_in_Dept\", each Table.RowCount(_), Int64.Type}}) in #\"Grouped rows\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}

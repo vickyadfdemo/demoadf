@@ -1,0 +1,82 @@
+{
+	"name": "MappingDataFlow_Filter",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeFilter"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file2",
+						"type": "DatasetReference"
+					},
+					"name": "Department"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Ds_filteroutput",
+						"type": "DatasetReference"
+					},
+					"name": "Filteroutput"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filterdeptid"
+				},
+				{
+					"name": "join1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> EmployeeFilter",
+				"source(output(",
+				"          {Dept_ID } as string,",
+				"          Dept_Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Department",
+				"EmployeeFilter filter(equals(Dept_ID,'101')) ~> filterdeptid",
+				"filterdeptid, Department join(Dept_ID == {Dept_ID },",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     partitionBy('hash', 1),",
+				"     broadcast: 'auto')~> join1",
+				"join1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string,",
+				"          {Dept_ID } as string,",
+				"          Dept_Name as string",
+				"     ),",
+				"     partitionFileNames:['FilterJoin.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Filteroutput"
+			]
+		}
+	}
+}

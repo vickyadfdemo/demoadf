@@ -1,0 +1,87 @@
+{
+	"name": "Parametrized_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Parametrised Data Copy",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_table1",
+						"type": "DatasetReference",
+						"parameters": {
+							"databasename": {
+								"value": "@pipeline().parameters.databasename",
+								"type": "Expression"
+							},
+							"sourcetable": {
+								"value": "@pipeline().parameters.sourcetablename",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_sql_table2",
+						"type": "DatasetReference",
+						"parameters": {
+							"databasename": {
+								"value": "@pipeline().parameters.databasename",
+								"type": "Expression"
+							},
+							"destinationtable": {
+								"value": "@pipeline().parameters.destinationtablename",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"sourcetablename": {
+				"type": "string"
+			},
+			"destinationtablename": {
+				"type": "string"
+			},
+			"databasename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-11-23T12:10:21Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,9 @@
+{
+	"name": "sessionvickyadf-df",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "43effce8-1749-4630-9bf5-7ab17b30b92b",
+		"tenantId": "d54b912d-4e1f-4047-9cb5-72e53e7b1c25"
+	}
+}
