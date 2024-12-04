@@ -1,0 +1,63 @@
+{
+	"name": "dataflow2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					},
+					"name": "Employee"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRowDB"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as string,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Employee",
+				"Employee alterRow(deleteIf(Dept_ID == '101'),",
+				"     updateIf(Emp_Name == 'vigneshwaran')) ~> AlterRowDB",
+				"AlterRowDB sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_No as integer,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as integer,",
+				"          Emp_Manager as string,",
+				"          Dept_ID as integer,",
+				"          country as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
