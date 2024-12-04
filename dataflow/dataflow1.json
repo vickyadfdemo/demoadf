@@ -1,0 +1,52 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_wrangling_file1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "emppartition"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_No as string,",
+				"          Emp_Name as string,",
+				"          Emp_Salary as integer '000',",
+				"          Emp_Manager as string,",
+				"          Dept_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 window(over(Dept_ID),",
+				"     desc(Emp_Salary, true),",
+				"     AvgSalary = avg(Emp_Salary)) ~> emppartition",
+				"emppartition sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['emppartition'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
